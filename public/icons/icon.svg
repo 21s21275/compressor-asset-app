@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="g" x1="64" y1="64" x2="448" y2="448" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#78a6ff"/>
+      <stop offset="1" stop-color="#b07cff"/>
+    </linearGradient>
+    <radialGradient id="r" cx="30%" cy="20%" r="80%">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="48" y="48" width="416" height="416" rx="120" fill="#0b1220"/>
+  <rect x="48" y="48" width="416" height="416" rx="120" fill="url(#r)"/>
+  <rect x="60" y="60" width="392" height="392" rx="112" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="8"/>
+
+  <g fill="none" stroke="url(#g)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M256 120c79 0 144 65 144 144 0 31-10 60-26 84l33 57c8 14-2 31-18 31h-63c-44 36-108 36-152 0h-63c-16 0-26-17-18-31l33-57c-16-24-26-53-26-84 0-79 65-144 144-144Z" stroke-width="22"/>
+    <path d="M198 263c15-26 44-43 77-43 48 0 88 40 88 88 0 33-17 62-43 77" stroke-width="22"/>
+  </g>
+
+  <g opacity="0.9">
+    <circle cx="146" cy="366" r="10" fill="#2ee59d"/>
+    <circle cx="366" cy="146" r="10" fill="#ff5c77"/>
+  </g>
+</svg>
+

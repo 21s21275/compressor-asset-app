@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compressor Asset Management</title>
+  <meta name="theme-color" content="#0b1220">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="container">
+    <header class="top">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2.75c3.7 0 6.7 3 6.7 6.7 0 1.45-.45 2.8-1.22 3.92l1.54 2.66a1.25 1.25 0 0 1-1.08 1.87h-2.94a6.68 6.68 0 0 1-8 0H4.06A1.25 1.25 0 0 1 2.98 16.3l1.54-2.66A6.63 6.63 0 0 1 5.3 9.45c0-3.7 3-6.7 6.7-6.7Z" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M9.25 9.7c.7-1.2 2-2 3.5-2 2.2 0 4 1.8 4 4 0 1.5-.8 2.8-2 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="brandText">
+          <h1>Compressor Asset Management</h1>
+          <p class="subtitle">Fast, duplicate-safe asset entry for field teams</p>
+        </div>
+      </div>
+      <div class="status">
+        <span class="pill" id="models-pill" data-state="loading">Loading models…</span>
+      </div>
+    </header>
+
+    <form id="asset-form" class="form">
+      <div class="field">
+        <label for="customerName">Customer Name</label>
+        <div class="control">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7.5 20.25c1.9-2.45 4-3.55 6.75-3.55s4.85 1.1 6.75 3.55" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M12 12.75a4.25 4.25 0 1 0 0-8.5 4.25 4.25 0 0 0 0 8.5Z" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+          </span>
+          <input
+            type="text"
+            id="customerName"
+            name="customerName"
+            required
+            autocomplete="off"
+            placeholder="e.g. Global Manufacturing Ltd"
+          >
+        </div>
+        <span class="hint">Existing customers will be reused automatically</span>
+      </div>
+
+      <div class="field">
+        <label for="modelId">Compressor Model</label>
+        <div class="control">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4.25 8.2 12 4.25l7.75 3.95-7.75 3.95L4.25 8.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              <path d="M4.25 8.2v7.6L12 19.75l7.75-3.95V8.2" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              <path d="M12 12.15v7.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <select id="modelId" name="modelId" required>
+            <option value="">Select a model</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="locationTag">Location</label>
+        <div class="control">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 21s7-4.6 7-11a7 7 0 1 0-14 0c0 6.4 7 11 7 11Z" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M12 12.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+          </span>
+          <input
+            type="text"
+            id="locationTag"
+            name="locationTag"
+            required
+            autocomplete="off"
+            placeholder="e.g. Main Plant - Area A"
+          >
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="serialNumber">Serial Number</label>
+        <div class="control">
+          <span class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7.5 12h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M9.2 7.8h7.6M9.2 16.2h7.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+              <path d="M6.25 4.75h11.5c1.1 0 2 .9 2 2v10.5c0 1.1-.9 2-2 2H6.25c-1.1 0-2-.9-2-2V6.75c0-1.1.9-2 2-2Z" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+          </span>
+          <input
+            type="text"
+            id="serialNumber"
+            name="serialNumber"
+            required
+            autocomplete="off"
+            placeholder="e.g. AL31-SN101"
+          >
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" id="submit-btn">
+          <span class="btnText">Add Asset</span>
+          <span class="btnSpinner" aria-hidden="true"></span>
+        </button>
+        <button type="reset" id="reset-btn">Clear</button>
+      </div>
+    </form>
+
+    <div id="message" class="toast" aria-live="polite" hidden></div>
+  </main>
+
+  <script src="/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').catch(function () {});
+      });
+    }
+  </script>
+</body>
+</html>
