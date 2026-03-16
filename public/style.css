@@ -383,3 +383,49 @@ button[type="submit"][data-busy="true"] .btnText {
   from { transform: translate3d(-1.2%, -0.8%, 0) scale(1.01); }
   to { transform: translate3d(1.2%, 0.8%, 0) scale(1.03); }
 }
+
+/* Autocomplete dropdown styles */
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--cardBorder);
+  border-radius: 8px;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.autocomplete-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  color: var(--text);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover {
+  background: rgba(120, 166, 255, 0.15);
+  color: var(--primary);
+}
+
+.autocomplete-item:first-child:hover {
+  border-radius: 8px 8px 0 0;
+}
+
+.autocomplete-item:last-child:hover {
+  border-radius: 0 0 8px 8px;
+}
+
+.autocomplete-item:only-child:hover {
+  border-radius: 8px;
+}

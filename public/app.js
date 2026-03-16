@@ -31,6 +31,70 @@
     modelsPill.textContent = text;
   }
 
+  // Autocomplete functionality
+  function createAutocomplete(input, apiUrl) {
+    let currentTimeout;
+    const dropdown = document.createElement('div');
+    dropdown.className = 'autocomplete-dropdown';
+    dropdown.style.display = 'none';
+    input.parentNode.style.position = 'relative';
+    input.parentNode.appendChild(dropdown);
+
+    input.addEventListener('input', function() {
+      const value = this.value.trim();
+      
+      clearTimeout(currentTimeout);
+      dropdown.style.display = 'none';
+      
+      if (value.length < 2) {
+        return;
+      }
+      
+      currentTimeout = setTimeout(async () => {
+        try {
+          const res = await fetch(apiUrl + '?q=' + encodeURIComponent(value));
+          const suggestions = await res.json();
+          
+          if (suggestions.length === 0) {
+            dropdown.style.display = 'none';
+            return;
+          }
+          
+          dropdown.innerHTML = '';
+          suggestions.forEach(suggestion => {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            item.textContent = suggestion;
+            item.addEventListener('click', function() {
+              input.value = suggestion;
+              dropdown.style.display = 'none';
+              input.focus();
+            });
+            dropdown.appendChild(item);
+          });
+          
+          dropdown.style.display = 'block';
+        } catch (err) {
+          console.error('Autocomplete error:', err);
+        }
+      }, 300);
+    });
+
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.style.display = 'none';
+      }
+    });
+
+    // Hide dropdown on Escape key
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        dropdown.style.display = 'none';
+      }
+    });
+  }
+
   async function loadModels() {
     try {
       setModelsPill('loading', 'Loading models…');
@@ -103,4 +167,9 @@
   });
 
   loadModels();
+
+  // Initialize autocomplete for input fields
+  createAutocomplete(document.getElementById('customerName'), '/api/customers/search');
+  createAutocomplete(document.getElementById('locationTag'), '/api/locations/search');
+  createAutocomplete(document.getElementById('serialNumber'), '/api/serial-numbers/search');
 })();

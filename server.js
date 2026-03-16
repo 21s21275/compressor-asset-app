@@ -55,6 +55,63 @@ app.get('/api/customers', async (req, res) => {
   }
 });
 
+// GET /api/customers/search - autocomplete for customer names
+app.get('/api/customers/search', async (req, res) => {
+  const { q } = req.query;
+  if (!q || q.length < 2) {
+    return res.json([]);
+  }
+  
+  try {
+    const { rows } = await pool.query(
+      'SELECT customer_name FROM customers WHERE customer_name ILIKE $1 ORDER BY customer_name LIMIT 10',
+      [`%${q}%`]
+    );
+    res.json(rows.map(row => row.customer_name));
+  } catch (err) {
+    console.error('Error searching customers:', err);
+    res.status(500).json({ error: 'Failed to search customers' });
+  }
+});
+
+// GET /api/locations/search - autocomplete for location tags
+app.get('/api/locations/search', async (req, res) => {
+  const { q } = req.query;
+  if (!q || q.length < 2) {
+    return res.json([]);
+  }
+  
+  try {
+    const { rows } = await pool.query(
+      'SELECT DISTINCT location_tag FROM compressor_assets WHERE location_tag ILIKE $1 ORDER BY location_tag LIMIT 10',
+      [`%${q}%`]
+    );
+    res.json(rows.map(row => row.location_tag));
+  } catch (err) {
+    console.error('Error searching locations:', err);
+    res.status(500).json({ error: 'Failed to search locations' });
+  }
+});
+
+// GET /api/serial-numbers/search - autocomplete for serial numbers
+app.get('/api/serial-numbers/search', async (req, res) => {
+  const { q } = req.query;
+  if (!q || q.length < 2) {
+    return res.json([]);
+  }
+  
+  try {
+    const { rows } = await pool.query(
+      'SELECT serial_number FROM compressor_assets WHERE serial_number ILIKE $1 ORDER BY serial_number LIMIT 10',
+      [`%${q}%`]
+    );
+    res.json(rows.map(row => row.serial_number));
+  } catch (err) {
+    console.error('Error searching serial numbers:', err);
+    res.status(500).json({ error: 'Failed to search serial numbers' });
+  }
+});
+
 // POST /api/assets - add new compressor asset
 app.post('/api/assets', async (req, res) => {
   const { customerName, modelId, locationTag, serialNumber } = req.body;
