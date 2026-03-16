@@ -161,35 +161,34 @@ app.post('/api/assets', async (req, res) => {
       return res.status(400).json({ error: 'Invalid compressor model' });
     }
 
-    // 3) Insert asset (serial number must be globally unique, case/trim-insensitive)
-    // Requires: UNIQUE INDEX on lower(btrim(serial_number))
+    // 3) Check if serial number already exists first
+    const existingCheck = await client.query(
+      `SELECT asset_id, customer_id, model_id
+       FROM compressor_assets
+       WHERE lower(btrim(serial_number)) = lower(btrim($1))
+       LIMIT 1`,
+      [serialNumberNorm]
+    );
+
+    if (existingCheck.rows.length > 0) {
+      const existing = existingCheck.rows[0];
+      return res.status(200).json({
+        success: true,
+        assetId: existing.asset_id,
+        customerId: existing.customer_id,
+        modelId: existing.model_id,
+        message: 'Serial number already exists',
+        duplicate: true,
+      });
+    }
+
+    // 4) Insert new asset (only if doesn't exist)
     const assetInsert = await client.query(
       `INSERT INTO compressor_assets (customer_id, model_id, serial_number, location_tag)
        VALUES ($1, $2, $3, $4)
-       ON CONFLICT ((lower(btrim(serial_number))))
-       DO NOTHING
        RETURNING asset_id, customer_id, model_id`,
       [customerId, modelIdNum, serialNumberNorm, locationTagNorm]
     );
-
-    if (assetInsert.rows.length === 0) {
-      const existing = await client.query(
-        `SELECT asset_id, customer_id, model_id
-         FROM compressor_assets
-         WHERE lower(btrim(serial_number)) = lower(btrim($1))
-         LIMIT 1`,
-        [serialNumberNorm]
-      );
-
-      const row = existing.rows[0];
-      return res.status(200).json({
-        success: true,
-        assetId: row?.asset_id ?? null,
-        customerId: row?.customer_id ?? null,
-        modelId: row?.model_id ?? null,
-        message: 'Asset already exists for this serial number',
-      });
-    }
 
     const asset = assetInsert.rows[0];
     return res.status(201).json({
@@ -198,6 +197,7 @@ app.post('/api/assets', async (req, res) => {
       customerId: asset.customer_id,
       modelId: asset.model_id,
       message: `Asset added successfully (asset_id: ${asset.asset_id})`,
+      duplicate: false,
     });
   } catch (err) {
     console.error('Error adding asset:', err);

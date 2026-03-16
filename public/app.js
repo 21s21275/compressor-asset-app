@@ -153,12 +153,22 @@
         return;
       }
 
-      showMessage(
-        'Asset added successfully. Asset ID: ' + data.assetId + ' (customer_id: ' + data.customerId + ', model_id: ' + data.modelId + ')',
-        'success'
-      );
-      form.reset();
-      document.getElementById('modelId').focus();
+      if (data.duplicate) {
+        showMessage(
+          'Serial number "' + serialNumber + '" already exists (Asset ID: ' + data.assetId + ')',
+          'error'
+        );
+        // Clear the serial number field for easy re-entry
+        document.getElementById('serialNumber').value = '';
+        document.getElementById('serialNumber').focus();
+      } else {
+        showMessage(
+          'Asset added successfully. Asset ID: ' + data.assetId,
+          'success'
+        );
+        form.reset();
+        document.getElementById('modelId').focus();
+      }
     } catch (err) {
       showMessage('Network error: ' + err.message, 'error');
     } finally {
