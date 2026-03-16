@@ -65,7 +65,7 @@ app.get('/api/customers/search', async (req, res) => {
   try {
     const { rows } = await pool.query(
       'SELECT customer_name FROM customers WHERE customer_name ILIKE $1 ORDER BY customer_name LIMIT 10',
-      [`%${q}%`]
+      [`${q}%`]
     );
     res.json(rows.map(row => row.customer_name));
   } catch (err) {
@@ -84,7 +84,7 @@ app.get('/api/locations/search', async (req, res) => {
   try {
     const { rows } = await pool.query(
       'SELECT DISTINCT location_tag FROM compressor_assets WHERE location_tag ILIKE $1 ORDER BY location_tag LIMIT 10',
-      [`%${q}%`]
+      [`${q}%`]
     );
     res.json(rows.map(row => row.location_tag));
   } catch (err) {
@@ -103,7 +103,7 @@ app.get('/api/serial-numbers/search', async (req, res) => {
   try {
     const { rows } = await pool.query(
       'SELECT serial_number FROM compressor_assets WHERE serial_number ILIKE $1 ORDER BY serial_number LIMIT 10',
-      [`%${q}%`]
+      [`${q}%`]
     );
     res.json(rows.map(row => row.serial_number));
   } catch (err) {
