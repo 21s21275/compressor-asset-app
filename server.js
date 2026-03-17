@@ -3,13 +3,77 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const session = require('express-session');
 const { pool } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Company credentials (you can change these in .env)
+const COMPANY_USERNAME = process.env.COMPANY_USERNAME || 'hightower';
+const COMPANY_PASSWORD = process.env.COMPANY_PASSWORD || 'HTE2026';
+
+// Session configuration
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'hte-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 8 * 60 * 60 * 1000 // 8 hours
+  }
+}));
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Authentication middleware
+function requireAuth(req, res, next) {
+  if (!req.session.authenticated) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+  next();
+}
+
+// POST /api/login - Company login
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required' });
+  }
+
+  if (username === COMPANY_USERNAME && password === COMPANY_PASSWORD) {
+    req.session.authenticated = true;
+    req.session.username = username;
+    res.json({
+      message: 'Login successful',
+      username: username
+    });
+  } else {
+    res.status(401).json({ error: 'Invalid credentials' });
+  }
+});
+
+// POST /api/logout - Logout
+app.post('/api/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      res.status(500).json({ error: 'Logout failed' });
+    } else {
+      res.json({ message: 'Logout successful' });
+    }
+  });
+});
+
+// GET /api/auth - Check authentication status
+app.get('/api/auth', (req, res) => {
+  res.json({
+    authenticated: !!req.session.authenticated,
+    username: req.session.username || null
+  });
+});
 
 // GET /api/health - check DB connection (helps debug "cannot fetch models")
 app.get('/api/health', async (req, res) => {
@@ -27,7 +91,7 @@ app.get('/api/health', async (req, res) => {
 });
 
 // GET /api/models - fetch all compressor models for dropdown
-app.get('/api/models', async (req, res) => {
+app.get('/api/models', requireAuth, async (req, res) => {
   try {
     const { rows } = await pool.query(
       'SELECT model_id, model_name FROM compressor_models ORDER BY model_name'
@@ -43,7 +107,7 @@ app.get('/api/models', async (req, res) => {
 });
 
 // GET /api/customers - list customers for reference
-app.get('/api/customers', async (req, res) => {
+app.get('/api/customers', requireAuth, async (req, res) => {
   try {
     const { rows } = await pool.query(
       'SELECT customer_id, customer_name FROM customers ORDER BY customer_name'
@@ -56,7 +120,7 @@ app.get('/api/customers', async (req, res) => {
 });
 
 // GET /api/customers/search - autocomplete for customer names
-app.get('/api/customers/search', async (req, res) => {
+app.get('/api/customers/search', requireAuth, async (req, res) => {
   const { q } = req.query;
   if (!q || q.length < 2) {
     return res.json([]);
@@ -75,7 +139,7 @@ app.get('/api/customers/search', async (req, res) => {
 });
 
 // GET /api/locations/search - autocomplete for location tags
-app.get('/api/locations/search', async (req, res) => {
+app.get('/api/locations/search', requireAuth, async (req, res) => {
   const { q } = req.query;
   if (!q || q.length < 2) {
     return res.json([]);
@@ -94,7 +158,7 @@ app.get('/api/locations/search', async (req, res) => {
 });
 
 // GET /api/serial-numbers/search - autocomplete for serial numbers
-app.get('/api/serial-numbers/search', async (req, res) => {
+app.get('/api/serial-numbers/search', requireAuth, async (req, res) => {
   const { q } = req.query;
   if (!q || q.length < 2) {
     return res.json([]);
@@ -113,7 +177,7 @@ app.get('/api/serial-numbers/search', async (req, res) => {
 });
 
 // POST /api/assets - add new compressor asset
-app.post('/api/assets', async (req, res) => {
+app.post('/api/assets', requireAuth, async (req, res) => {
   const { customerName, modelId, locationTag, serialNumber } = req.body;
 
   if (!customerName || !modelId || !locationTag || !serialNumber) {

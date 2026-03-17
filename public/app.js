@@ -5,6 +5,25 @@
   const modelSelect = document.getElementById('modelId');
   const modelsPill = document.getElementById('models-pill');
 
+  // Check authentication first
+  async function checkAuth() {
+    try {
+      const res = await fetch('/api/auth');
+      const data = await res.json();
+      
+      if (!data.authenticated) {
+        // Redirect to login page
+        window.location.href = '/login.html';
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error('Auth check failed:', err);
+      window.location.href = '/login.html';
+      return false;
+    }
+  }
+
   function showMessage(text, type) {
     messageEl.textContent = text;
     messageEl.className = 'toast ' + type;
@@ -149,6 +168,10 @@
       const data = await res.json();
 
       if (!res.ok) {
+        if (res.status === 401) {
+          window.location.href = '/login.html';
+          return;
+        }
         showMessage(data.error || 'Failed to add asset.', 'error');
         return;
       }
@@ -176,10 +199,33 @@
     }
   });
 
-  loadModels();
+  // Initialize app
+  async function init() {
+    const isAuthenticated = await checkAuth();
+    if (isAuthenticated) {
+      loadModels();
+      // Initialize autocomplete for input fields
+      createAutocomplete(document.getElementById('customerName'), '/api/customers/search');
+      createAutocomplete(document.getElementById('locationTag'), '/api/locations/search');
+      createAutocomplete(document.getElementById('serialNumber'), '/api/serial-numbers/search');
+      
+      // Add logout functionality
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', async function() {
+          try {
+            const res = await fetch('/api/logout', { method: 'POST' });
+            if (res.ok) {
+              window.location.href = '/login.html';
+            }
+          } catch (err) {
+            console.error('Logout error:', err);
+            window.location.href = '/login.html';
+          }
+        });
+      }
+    }
+  }
 
-  // Initialize autocomplete for input fields
-  createAutocomplete(document.getElementById('customerName'), '/api/customers/search');
-  createAutocomplete(document.getElementById('locationTag'), '/api/locations/search');
-  createAutocomplete(document.getElementById('serialNumber'), '/api/serial-numbers/search');
+  init();
 })();
