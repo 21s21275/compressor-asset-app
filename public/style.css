@@ -492,6 +492,101 @@ button[type="submit"][data-busy="true"] .btnText {
   margin-bottom: 1.5rem;
 }
 
+.login-form .field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.login-form .control {
+  position: relative;
+}
+
+.login-form .control input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 16px;
+  border: 2px solid var(--muted);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.login-form .control input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+}
+
+.login-form .control input::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.login-form .control .icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: var(--muted);
+  pointer-events: none;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-form .control .icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.6;
+}
+
+.login-form .control input[type="text"] {
+  padding-left: 44px;
+}
+
+.login-form .control input[type="password"] {
+  padding-left: 44px;
+  padding-right: 44px;
+}
+
+.login-form .control #toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-form .control #toggle-password:hover {
+  color: var(--primary);
+  background: rgba(30, 58, 138, 0.1);
+}
+
+.login-form .control #toggle-password svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.5;
+}
+
 .login-form .actions {
   margin-top: 2rem;
 }
