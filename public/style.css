@@ -202,26 +202,12 @@ label {
   position: relative;
 }
 
-.icon {
-  position: absolute;
-  left: 0.8rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 18px;
-  height: 18px;
-  color: rgba(255,255,255,0.62);
-  pointer-events: none;
-}
-
-.icon svg {
-  width: 18px;
-  height: 18px;
-}
+/* Remove old icon styles that conflict with login form */
 
 input[type="text"],
 select {
   width: 100%;
-  padding: 0.78rem 0.95rem 0.78rem 2.4rem;
+  padding: 0.78rem 0.95rem 0.78rem 0.95rem;
   font-size: 1rem;
   color: var(--text);
   border: 1px solid rgba(255, 255, 255, 0.16);
