@@ -538,15 +538,19 @@ button[type="submit"][data-busy="true"] .btnText {
   color: var(--muted);
   pointer-events: none;
   z-index: 1;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .login-form .control .icon svg {
   width: 20px;
   height: 20px;
   stroke-width: 1.6;
+  fill: none;
+  stroke: currentColor;
 }
 
 .login-form .control input[type="text"] {
@@ -571,9 +575,11 @@ button[type="submit"][data-busy="true"] .btnText {
   border-radius: 4px;
   transition: all 0.2s ease;
   z-index: 2;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .login-form .control #toggle-password:hover {
@@ -585,6 +591,17 @@ button[type="submit"][data-busy="true"] .btnText {
   width: 20px;
   height: 20px;
   stroke-width: 1.5;
+  fill: none;
+  stroke: currentColor;
+  display: block !important;
+}
+
+.login-form .control #toggle-password #eye-icon {
+  display: block !important;
+}
+
+.login-form .control #toggle-password #eye-off-icon {
+  display: none !important;
 }
 
 .login-form .actions {
