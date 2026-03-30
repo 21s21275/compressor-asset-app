@@ -9,9 +9,13 @@ const { pool } = require('./db');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Company credentials (fixed values)
-const COMPANY_USERNAME = 'hightower';
-const COMPANY_PASSWORD = 'HTE2026';
+// Company users (4 hardcoded users)
+const COMPANY_USERS = [
+  { username: 'hightower', password: 'HTE2026', fullName: 'Admin User' },
+  { username: 'user2', password: 'User2Pass123', fullName: 'Team Member 2' },
+  { username: 'user3', password: 'User3Pass456', fullName: 'Team Member 3' },
+  { username: 'user4', password: 'User4Pass789', fullName: 'Team Member 4' }
+];
 const JWT_SECRET = process.env.JWT_SECRET || 'hte-jwt-secret-2026';
 
 // Professional JWT-based authentication
@@ -34,7 +38,7 @@ function requireAuth(req, res, next) {
   }
 }
 
-// POST /api/login - Company login (JWT-based)
+// POST /api/login - User login (4 hardcoded users)
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
@@ -44,30 +48,41 @@ app.post('/api/login', (req, res) => {
     return res.status(400).json({ error: 'Username and password are required' });
   }
 
-  if (username === COMPANY_USERNAME && password === COMPANY_PASSWORD) {
-    // Generate JWT token (professional approach)
-    const token = jwt.sign(
-      { 
-        username: username,
-        company: 'High Tower Engineering',
-        role: 'user'
-      },
-      JWT_SECRET,
-      { expiresIn: '8h' } // 8 hour expiration
-    );
-    
-    console.log('Login successful, JWT generated');
-    
-    res.json({
-      message: 'Login successful',
-      username: username,
-      token: token,
-      expiresIn: '8h'
-    });
-  } else {
-    console.log('Login failed');
-    res.status(401).json({ error: 'Invalid credentials' });
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters' });
   }
+
+  // Check against hardcoded users
+  const user = COMPANY_USERS.find(u => u.username === username && u.password === password);
+
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid username or password' });
+  }
+
+  // Generate JWT token
+  const token = jwt.sign(
+    { 
+      username: user.username,
+      fullName: user.fullName,
+      role: 'user',
+      company: 'High Tower Engineering'
+    },
+    JWT_SECRET,
+    { expiresIn: '8h' }
+  );
+  
+  console.log('Login successful for user:', username);
+  
+  res.json({
+    message: 'Login successful',
+    user: {
+      username: user.username,
+      fullName: user.fullName,
+      role: 'user'
+    },
+    token: token,
+    expiresIn: '8h'
+  });
 });
 
 // POST /api/logout - Logout (JWT-based)
@@ -89,11 +104,22 @@ app.get('/api/auth', (req, res) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
+    
+    // Find user in hardcoded users
+    const user = COMPANY_USERS.find(u => u.username === decoded.username);
+    
+    if (!user) {
+      return res.json({
+        authenticated: false,
+        username: null
+      });
+    }
+    
     res.json({
       authenticated: true,
-      username: decoded.username,
-      company: decoded.company,
-      role: decoded.role,
+      username: user.username,
+      fullName: user.fullName,
+      role: 'user',
       expiresAt: decoded.exp * 1000
     });
   } catch (err) {
