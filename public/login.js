@@ -26,15 +26,25 @@
   // Check if already authenticated
   async function checkAuth() {
     try {
-      const res = await fetch('/api/auth');
+      const token = localStorage.getItem('hte-token');
+      if (!token) return false;
+      
+      const res = await fetch('/api/auth', {
+        headers: { 'Authorization': token }
+      });
       const data = await res.json();
       
       if (data.authenticated) {
-        // Redirect to main app
         window.location.href = '/';
+        return true;
+      } else {
+        localStorage.removeItem('hte-token');
+        return false;
       }
     } catch (err) {
       console.error('Auth check failed:', err);
+      localStorage.removeItem('hte-token');
+      return false;
     }
   }
 
@@ -66,6 +76,9 @@
         return;
       }
 
+      // Store token in localStorage
+      localStorage.setItem('hte-token', data.token);
+      
       showMessage('Login successful! Redirecting...', 'success');
       
       // Redirect to main app after short delay

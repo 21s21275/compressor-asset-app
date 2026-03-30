@@ -8,17 +8,26 @@
   // Check authentication first
   async function checkAuth() {
     try {
-      const res = await fetch('/api/auth');
+      const token = localStorage.getItem('hte-token');
+      if (!token) {
+        window.location.href = '/login.html';
+        return false;
+      }
+      
+      const res = await fetch('/api/auth', {
+        headers: { 'Authorization': token }
+      });
       const data = await res.json();
       
       if (!data.authenticated) {
-        // Redirect to login page
+        localStorage.removeItem('hte-token');
         window.location.href = '/login.html';
         return false;
       }
       return true;
     } catch (err) {
       console.error('Auth check failed:', err);
+      localStorage.removeItem('hte-token');
       window.location.href = '/login.html';
       return false;
     }
@@ -71,7 +80,10 @@
       
       currentTimeout = setTimeout(async () => {
         try {
-          const res = await fetch(apiUrl + '?q=' + encodeURIComponent(value));
+          const token = localStorage.getItem('hte-token');
+          const res = await fetch(apiUrl + '?q=' + encodeURIComponent(value), {
+            headers: { 'Authorization': token }
+          });
           const suggestions = await res.json();
           
           if (suggestions.length === 0) {
@@ -117,7 +129,10 @@
   async function loadModels() {
     try {
       setModelsPill('loading', 'Loading models…');
-      const res = await fetch('/api/models');
+      const token = localStorage.getItem('hte-token');
+      const res = await fetch('/api/models', {
+        headers: { 'Authorization': token }
+      });
       const data = await res.json().catch(function () { return {}; });
       if (!res.ok) {
         var msg = data.detail || data.error || ('HTTP ' + res.status);
@@ -154,9 +169,13 @@
     setBusy(true);
 
     try {
+      const token = localStorage.getItem('hte-token');
       const res = await fetch('/api/assets', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
         body: JSON.stringify({
           customerName,
           modelId: Number(modelId),
@@ -169,6 +188,7 @@
 
       if (!res.ok) {
         if (res.status === 401) {
+          localStorage.removeItem('hte-token');
           window.location.href = '/login.html';
           return;
         }
@@ -214,12 +234,16 @@
       if (logoutBtn) {
         logoutBtn.addEventListener('click', async function() {
           try {
-            const res = await fetch('/api/logout', { method: 'POST' });
-            if (res.ok) {
-              window.location.href = '/login.html';
-            }
+            const token = localStorage.getItem('hte-token');
+            const res = await fetch('/api/logout', { 
+              method: 'POST',
+              headers: { 'Authorization': token }
+            });
+            localStorage.removeItem('hte-token');
+            window.location.href = '/login.html';
           } catch (err) {
             console.error('Logout error:', err);
+            localStorage.removeItem('hte-token');
             window.location.href = '/login.html';
           }
         });

@@ -3,7 +3,6 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const session = require('express-session');
 const { pool } = require('./db');
 
 const app = express();
@@ -13,33 +12,22 @@ const PORT = process.env.PORT || 3000;
 const COMPANY_USERNAME = 'hightower';
 const COMPANY_PASSWORD = 'HTE2026';
 
-// Session configuration - MUST come before express.static
-app.use(session({
-  secret: 'hte-session-secret-2026-fixed',
-  resave: false,
-  saveUninitialized: true,
-  name: 'hte-session',
-  rolling: false,
-  cookie: {
-    secure: false, // Back to false for simplicity
-    httpOnly: true,
-    sameSite: 'lax', // Back to lax
-    maxAge: 8 * 60 * 60 * 1000 // 8 hours
-  }
-}));
+// Simple token-based authentication (no sessions)
+const activeTokens = new Set();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Authentication middleware
+// Authentication middleware (token-based)
 function requireAuth(req, res, next) {
-  if (!req.session.authenticated) {
+  const token = req.headers.authorization;
+  if (!token || !activeTokens.has(token)) {
     return res.status(401).json({ error: 'Authentication required' });
   }
   next();
 }
 
-// POST /api/login - Company login
+// POST /api/login - Company login (token-based)
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
@@ -50,14 +38,16 @@ app.post('/api/login', (req, res) => {
   }
 
   if (username === COMPANY_USERNAME && password === COMPANY_PASSWORD) {
-    req.session.authenticated = true;
-    req.session.username = username;
+    // Generate simple token
+    const token = 'hte-token-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    activeTokens.add(token);
     
-    console.log('Login successful, session:', req.session);
+    console.log('Login successful, token generated');
     
     res.json({
       message: 'Login successful',
-      username: username
+      username: username,
+      token: token
     });
   } else {
     console.log('Login failed');
@@ -65,37 +55,23 @@ app.post('/api/login', (req, res) => {
   }
 });
 
-// POST /api/logout - Logout
+// POST /api/logout - Logout (token-based)
 app.post('/api/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      res.status(500).json({ error: 'Logout failed' });
-    } else {
-      res.json({ message: 'Logout successful' });
-    }
-  });
-});
-
-// GET /api/auth - Check authentication status
-app.get('/api/auth', (req, res) => {
-  console.log('Auth check - session:', req.session);
-  res.json({
-    authenticated: !!req.session.authenticated,
-    username: req.session.username || null,
-    sessionId: req.sessionID
-  });
-});
-
-// GET /api/test-session - Simple session test
-app.get('/api/test-session', (req, res) => {
-  if (!req.session.test) {
-    req.session.test = 'Session working!';
-    console.log('Session created:', req.sessionID);
+  const token = req.headers.authorization;
+  if (token && activeTokens.has(token)) {
+    activeTokens.delete(token);
   }
+  res.json({ message: 'Logout successful' });
+});
+
+// GET /api/auth - Check authentication status (token-based)
+app.get('/api/auth', (req, res) => {
+  const token = req.headers.authorization;
+  const authenticated = token && activeTokens.has(token);
+  
   res.json({
-    message: 'Session test route',
-    sessionId: req.sessionID,
-    test: req.session.test
+    authenticated: authenticated,
+    username: authenticated ? COMPANY_USERNAME : null
   });
 });
 
