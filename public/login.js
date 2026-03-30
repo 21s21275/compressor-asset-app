@@ -23,14 +23,14 @@
     loginBtn.dataset.busy = isBusy ? 'true' : 'false';
   }
 
-  // Check if already authenticated
+  // Check if already authenticated (JWT)
   async function checkAuth() {
     try {
-      const token = localStorage.getItem('hte-token');
+      const token = localStorage.getItem('hte-jwt-token');
       if (!token) return false;
       
       const res = await fetch('/api/auth', {
-        headers: { 'Authorization': token }
+        headers: { 'Authorization': 'Bearer ' + token }
       });
       const data = await res.json();
       
@@ -38,12 +38,12 @@
         window.location.href = '/';
         return true;
       } else {
-        localStorage.removeItem('hte-token');
+        localStorage.removeItem('hte-jwt-token');
         return false;
       }
     } catch (err) {
       console.error('Auth check failed:', err);
-      localStorage.removeItem('hte-token');
+      localStorage.removeItem('hte-jwt-token');
       return false;
     }
   }
@@ -76,8 +76,8 @@
         return;
       }
 
-      // Store token in localStorage
-      localStorage.setItem('hte-token', data.token);
+      // Store JWT token in localStorage
+      localStorage.setItem('hte-jwt-token', data.token);
       
       showMessage('Login successful! Redirecting...', 'success');
       

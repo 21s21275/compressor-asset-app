@@ -3,6 +3,7 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 const { pool } = require('./db');
 
 const app = express();
@@ -11,23 +12,29 @@ const PORT = process.env.PORT || 3000;
 // Company credentials (fixed values)
 const COMPANY_USERNAME = 'hightower';
 const COMPANY_PASSWORD = 'HTE2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'hte-jwt-secret-2026';
 
-// Simple token-based authentication (no sessions)
-const activeTokens = new Set();
-
+// Professional JWT-based authentication
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Authentication middleware (token-based)
+// Authentication middleware (JWT-based)
 function requireAuth(req, res, next) {
-  const token = req.headers.authorization;
-  if (!token || !activeTokens.has(token)) {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) {
     return res.status(401).json({ error: 'Authentication required' });
   }
-  next();
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
 }
 
-// POST /api/login - Company login (token-based)
+// POST /api/login - Company login (JWT-based)
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
@@ -38,16 +45,24 @@ app.post('/api/login', (req, res) => {
   }
 
   if (username === COMPANY_USERNAME && password === COMPANY_PASSWORD) {
-    // Generate simple token
-    const token = 'hte-token-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    activeTokens.add(token);
+    // Generate JWT token (professional approach)
+    const token = jwt.sign(
+      { 
+        username: username,
+        company: 'High Tower Engineering',
+        role: 'user'
+      },
+      JWT_SECRET,
+      { expiresIn: '8h' } // 8 hour expiration
+    );
     
-    console.log('Login successful, token generated');
+    console.log('Login successful, JWT generated');
     
     res.json({
       message: 'Login successful',
       username: username,
-      token: token
+      token: token,
+      expiresIn: '8h'
     });
   } else {
     console.log('Login failed');
@@ -55,24 +70,38 @@ app.post('/api/login', (req, res) => {
   }
 });
 
-// POST /api/logout - Logout (token-based)
+// POST /api/logout - Logout (JWT-based)
 app.post('/api/logout', (req, res) => {
-  const token = req.headers.authorization;
-  if (token && activeTokens.has(token)) {
-    activeTokens.delete(token);
-  }
+  // JWT tokens are stateless - client just removes token
   res.json({ message: 'Logout successful' });
 });
 
-// GET /api/auth - Check authentication status (token-based)
+// GET /api/auth - Check authentication status (JWT-based)
 app.get('/api/auth', (req, res) => {
-  const token = req.headers.authorization;
-  const authenticated = token && activeTokens.has(token);
+  const token = req.headers.authorization?.replace('Bearer ', '');
   
-  res.json({
-    authenticated: authenticated,
-    username: authenticated ? COMPANY_USERNAME : null
-  });
+  if (!token) {
+    return res.json({
+      authenticated: false,
+      username: null
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    res.json({
+      authenticated: true,
+      username: decoded.username,
+      company: decoded.company,
+      role: decoded.role,
+      expiresAt: decoded.exp * 1000
+    });
+  } catch (err) {
+    res.json({
+      authenticated: false,
+      username: null
+    });
+  }
 });
 
 // GET /api/health - check DB connection (helps debug "cannot fetch models")
