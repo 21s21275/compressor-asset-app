@@ -51,10 +51,10 @@ body {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 42px 42px;
-  mask-image: radial-gradient(600px 420px at 50% 14%, rgba(0,0,0,0.9), transparent 70%);
+  mask-image: radial-gradient(600px 420px at 50% 14%, rgba(0, 0, 0, 0.9), transparent 70%);
   pointer-events: none;
   z-index: -1;
   opacity: 0.25;
@@ -87,7 +87,7 @@ body {
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(120, 166, 255, 0.22), rgba(176, 124, 255, 0.18));
   border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
   display: grid;
   place-items: center;
   color: rgba(255, 255, 255, 0.9);
@@ -123,9 +123,9 @@ body {
   border-radius: 999px;
   font-size: 0.82rem;
   font-weight: 700;
-  border: 1px solid rgba(255,255,255,0.14);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(10, 16, 28, 0.35);
-  color: rgba(255,255,255,0.78);
+  color: rgba(255, 255, 255, 0.78);
   white-space: nowrap;
 }
 
@@ -134,12 +134,12 @@ body {
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.35);
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
 }
 
 .pill[data-state="ok"] {
-  color: rgba(225,255,243,0.95);
+  color: rgba(225, 255, 243, 0.95);
   border-color: rgba(46, 229, 157, 0.25);
 }
 
@@ -166,7 +166,7 @@ body {
   padding: 1.4rem 1.35rem 1.25rem;
   box-shadow: var(--shadow);
   backdrop-filter: blur(14px);
-  animation: rise 520ms cubic-bezier(.2,.9,.2,1) both;
+  animation: rise 520ms cubic-bezier(.2, .9, .2, 1) both;
 }
 
 .form::before {
@@ -209,7 +209,7 @@ label {
   transform: translateY(-50%);
   width: 18px;
   height: 18px;
-  color: rgba(255,255,255,0.62);
+  color: rgba(255, 255, 255, 0.62);
   pointer-events: none;
 }
 
@@ -350,9 +350,9 @@ button[type="submit"][data-busy="true"] .btnText {
   font-weight: 650;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(10, 16, 28, 0.55);
-  box-shadow: 0 18px 60px rgba(0,0,0,0.55);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(14px);
-  animation: toastIn 260ms cubic-bezier(.2,.9,.2,1) both;
+  animation: toastIn 260ms cubic-bezier(.2, .9, .2, 1) both;
 }
 
 .toast.success {
@@ -366,22 +366,43 @@ button[type="submit"][data-busy="true"] .btnText {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes toastIn {
-  from { transform: translateX(-50%) translateY(10px); opacity: 0; }
-  to { transform: translateX(-50%) translateY(0); opacity: 1; }
+  from {
+    transform: translateX(-50%) translateY(10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes rise {
-  from { transform: translateY(10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes drift {
-  from { transform: translate3d(-1.2%, -0.8%, 0) scale(1.01); }
-  to { transform: translate3d(1.2%, 0.8%, 0) scale(1.03); }
+  from {
+    transform: translate3d(-1.2%, -0.8%, 0) scale(1.01);
+  }
+
+  to {
+    transform: translate3d(1.2%, 0.8%, 0) scale(1.03);
+  }
 }
 
 /* Autocomplete dropdown styles */
@@ -563,36 +584,37 @@ button[type="submit"][data-busy="true"] .btnText {
 }
 
 .login-form .control #toggle-password {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--muted);
-  padding: 6px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  z-index: 2;
+  position: absolute !important;
+  right: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: rgba(10, 16, 28, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  cursor: pointer !important;
+  color: var(--muted) !important;
+  padding: 6px !important;
+  border-radius: 4px !important;
+  z-index: 10 !important;
   display: flex !important;
-  align-items: center;
-  justify-content: center;
+  align-items: center !important;
+  justify-content: center !important;
   opacity: 1 !important;
   visibility: visible !important;
+  transition: all 0.2s ease !important;
 }
 
 .login-form .control #toggle-password:hover {
-  color: var(--primary);
-  background: rgba(30, 58, 138, 0.1);
+  color: var(--primary) !important;
+  background: rgba(30, 58, 138, 0.3) !important;
+  border-color: rgba(30, 58, 138, 0.5) !important;
 }
 
 .login-form .control #toggle-password svg {
-  width: 20px;
-  height: 20px;
-  stroke-width: 1.5;
-  fill: none;
-  stroke: currentColor;
+  width: 18px !important;
+  height: 18px !important;
+  stroke-width: 2 !important;
+  fill: none !important;
+  stroke: currentColor !important;
   display: block !important;
 }
 
