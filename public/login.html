@@ -6,7 +6,7 @@
   <title>High Tower Engineering - Login</title>
   <meta name="theme-color" content="#1e3a8a">
   <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <main class="container">
@@ -83,16 +83,18 @@
             </div>
           </div>
 
-          <button type="submit" id="login-btn" data-busy="false">
-            <span class="btn-text">Sign In</span>
-            <span class="btn-spinner" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="31.416" stroke-dashoffset="15.708" stroke-linecap="round">
-                  <animate attributeName="stroke-dashoffset" from="15.708" to="47.124" dur="0.6s" repeatCount="indefinite"/>
-                </circle>
-              </svg>
-            </span>
-          </button>
+          <div class="actions">
+            <button type="submit" id="login-btn" data-busy="false">
+              <span class="btnText">Sign In</span>
+              <span class="btnSpinner" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="31.416" stroke-dashoffset="15.708" stroke-linecap="round">
+                    <animate attributeName="stroke-dashoffset" from="15.708" to="47.124" dur="0.6s" repeatCount="indefinite"/>
+                  </circle>
+                </svg>
+              </span>
+            </button>
+          </div>
         </form>
         <div id="message" class="toast" hidden></div>
       </div>
@@ -103,6 +105,6 @@
     </footer>
   </main>
 
-  <script src="/login.js"></script>
+  <script src="./login.js"></script>
 </body>
 </html>
