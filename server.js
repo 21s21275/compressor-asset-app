@@ -9,18 +9,21 @@ const { pool } = require('./db');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Company credentials (you can change these in .env)
-const COMPANY_USERNAME = process.env.COMPANY_USERNAME || 'hightower';
-const COMPANY_PASSWORD = process.env.COMPANY_PASSWORD || 'HTE2026';
+// Company credentials (fixed values)
+const COMPANY_USERNAME = 'hightower';
+const COMPANY_PASSWORD = 'HTE2026';
 
-// Session configuration
+// Session configuration - MUST come before express.static
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'hte-session-secret',
+  secret: 'hte-session-secret-2026-fixed',
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
+  name: 'hte-session',
+  rolling: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: false, // Back to false for simplicity
     httpOnly: true,
+    sameSite: 'lax', // Back to lax
     maxAge: 8 * 60 * 60 * 1000 // 8 hours
   }
 }));
@@ -40,6 +43,8 @@ function requireAuth(req, res, next) {
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
+  console.log('Login attempt:', { username, passwordLength: password?.length });
+
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password are required' });
   }
@@ -47,11 +52,15 @@ app.post('/api/login', (req, res) => {
   if (username === COMPANY_USERNAME && password === COMPANY_PASSWORD) {
     req.session.authenticated = true;
     req.session.username = username;
+    
+    console.log('Login successful, session:', req.session);
+    
     res.json({
       message: 'Login successful',
       username: username
     });
   } else {
+    console.log('Login failed');
     res.status(401).json({ error: 'Invalid credentials' });
   }
 });
@@ -69,9 +78,24 @@ app.post('/api/logout', (req, res) => {
 
 // GET /api/auth - Check authentication status
 app.get('/api/auth', (req, res) => {
+  console.log('Auth check - session:', req.session);
   res.json({
     authenticated: !!req.session.authenticated,
-    username: req.session.username || null
+    username: req.session.username || null,
+    sessionId: req.sessionID
+  });
+});
+
+// GET /api/test-session - Simple session test
+app.get('/api/test-session', (req, res) => {
+  if (!req.session.test) {
+    req.session.test = 'Session working!';
+    console.log('Session created:', req.sessionID);
+  }
+  res.json({
+    message: 'Session test route',
+    sessionId: req.sessionID,
+    test: req.session.test
   });
 });
 
